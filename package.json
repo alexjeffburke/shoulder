@@ -42,7 +42,7 @@
   },
   "files": [
     "bin",
-    "src"
+    "lib"
   ],
   "keywords": [
     "check",
