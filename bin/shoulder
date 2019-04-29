@@ -1,0 +1,40 @@
+#!/usr/bin/env node
+
+const wrap = require('@gustavnikolaj/async-main-wrap');
+const yargs = require('yargs');
+
+const cli = require('../lib/cli');
+
+const configureArgs = () => yargs =>
+  yargs
+    .positional('package', {
+      type: 'string',
+      describe: 'The package for which to fetch dependents.'
+    })
+    .option('metric', {
+      type: 'string',
+      choices: ['downloads', 'stars'],
+      default: 'downloads',
+      describe: 'The metric to use when ordering retrieved dependents.'
+    })
+    .option('librariesio', {
+      type: 'string',
+      describe: 'An API key for accessing dependents data via Libraries.IO.'
+    });
+
+const processArgs = () =>
+  yargs
+    .usage('$0 <package>')
+    .command(
+      '* <package>',
+      'Automatically find dependent projects for the specified package.',
+      configureArgs()
+    )
+    .help().argv;
+
+const processArgsAndExecute = cwd => {
+  const argv = processArgs();
+  return cli(cwd, argv);
+};
+
+wrap(processArgsAndExecute)(process.cwd());
