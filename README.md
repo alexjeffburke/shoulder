@@ -1,5 +1,9 @@
 # Shoulder
 
+[![NPM version](https://img.shields.io/npm/v/shoulder.svg)](https://www.npmjs.com/package/shoulder)
+[![Build Status](https://img.shields.io/travis/alexjeffburke/shoulder/master.svg)](https://travis-ci.org/alexjeffburke/shoulder)
+[![Coverage Status](https://img.shields.io/coveralls/alexjeffburke/shoulder/master.svg)](https://coveralls.io/r/alexjeffburke/shoulder?branch=master)
+
 Automatically find projects dependent on a particular package.
 
 ## Use
