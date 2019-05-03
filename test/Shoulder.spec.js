@@ -44,6 +44,21 @@ describe('Shoulder', () => {
     );
   });
 
+  it('should reject on invalid metric', () => {
+    const MockModuleStats = createMockModuleStats();
+    MockModuleStats._instance.fetchDependents.rejects(new Error('fail'));
+
+    const shoulder = new Shoulder({
+      package: 'somepackage'
+    });
+
+    return expect(
+      () => shoulder.run({ metric: 'unknown' }),
+      'to be rejected with',
+      new Error('Shoulder: unsupported metric unknown')
+    );
+  });
+
   it('should construct ModuleStats', () => {
     const MockModuleStats = createMockModuleStats();
     MockModuleStats._instance.fetchDependents.rejects(new Error('fail'));
@@ -55,10 +70,12 @@ describe('Shoulder', () => {
     return expect(
       () =>
         shoulder.run({
+          metric: 'downloads',
           librariesIoApiKey: 'SOME_KEY',
           _ModuleStats: MockModuleStats
         }),
-      'to be rejected'
+      'to be rejected with',
+      'fail'
     ).then(() => {
       expect(MockModuleStats, 'to have a call satisfying', [
         'somepackage',
