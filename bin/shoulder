@@ -11,6 +11,11 @@ const configureArgs = () => yargs =>
       type: 'string',
       describe: 'The package for which to fetch dependents.'
     })
+    .option('list', {
+      alias: 'l',
+      type: 'boolean',
+      describe: 'Output dependents one per line to stdout.'
+    })
     .option('metric', {
       type: 'string',
       choices: ['downloads', 'stars'],

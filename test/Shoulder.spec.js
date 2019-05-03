@@ -221,5 +221,14 @@ describe('Shoulder', () => {
 
       expect(shoulder.outputter, 'to be', outputters.json);
     });
+
+    it('should allow list', () => {
+      const shoulder = new Shoulder({
+        package: 'somepackage',
+        outputter: 'list'
+      });
+
+      expect(shoulder.outputter, 'to be', outputters.list);
+    });
   });
 });

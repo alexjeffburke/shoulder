@@ -36,8 +36,8 @@ describe('cli', () => {
         }),
       'to be rejected'
     ).then(() => {
-      expect(MockShoulder, 'to have a call satisfying', [
-        { package: 'somepackage' }
+      expect(MockShoulder, 'to have a call exhaustively satisfying', [
+        { package: 'somepackage', outputter: 'json' }
       ]);
     });
   });
@@ -82,6 +82,29 @@ describe('cli', () => {
       expect(MockShoulder._instance.run, 'to have a call satisfying', [
         { metric: 'stars', librariesIoApiKey: 'SOME_KEY' }
       ]);
+    });
+  });
+
+  describe('with the list option', () => {
+    it('should set the list oututter', () => {
+      const MockShoulder = createMockShoulder();
+      MockShoulder._instance.run.rejects(new Error('fail'));
+      const args = {
+        package: 'somepackage',
+        list: true
+      };
+
+      return expect(
+        () =>
+          cli(null, args, {
+            _Shoulder: MockShoulder
+          }),
+        'to be rejected'
+      ).then(() => {
+        expect(MockShoulder, 'to have a call exhaustively satisfying', [
+          { package: 'somepackage', outputter: 'list' }
+        ]);
+      });
     });
   });
 });
