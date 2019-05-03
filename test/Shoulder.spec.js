@@ -5,6 +5,7 @@ const sinon = require('sinon');
 
 const Shoulder = require('../lib/Shoulder');
 const Project = require('../lib/Project');
+const outputters = require('../lib/outputters');
 
 function createMockModuleStats() {
   const MockModuleStats = sinon.stub().named('MockModuleStats');
@@ -171,5 +172,54 @@ describe('Shoulder', () => {
       'to be fulfilled with',
       ['somedependent']
     );
+  });
+
+  it('should call the outputter with the correct arguments', () => {
+    const MockModuleStats = createMockModuleStats();
+    MockModuleStats._instance.fetchDependents.resolves(['foo']);
+    const MockProjectStats = createMockProjectStats();
+    MockProjectStats._instance.outputProjectNamesForMetric.resolves([
+      'somedependent'
+    ]);
+
+    const shoulder = new Shoulder({
+      package: 'somepackage'
+    });
+    sinon.stub(shoulder, 'output');
+
+    return expect(
+      () =>
+        shoulder.run({
+          cwd: '/some/path',
+          metric: 'downloads',
+          _ModuleStats: MockModuleStats,
+          _ProjectStats: MockProjectStats
+        }),
+      'to be fulfilled'
+    ).then(() => {
+      expect(shoulder.output, 'to have a call satisfying', [
+        ['somedependent'],
+        { cwd: '/some/path', packageName: 'somepackage' }
+      ]);
+    });
+  });
+
+  describe('outputters', () => {
+    it('should default to passthrough', () => {
+      const shoulder = new Shoulder({
+        package: 'somepackage'
+      });
+
+      expect(shoulder.outputter, 'to be a function');
+    });
+
+    it('should allow json', () => {
+      const shoulder = new Shoulder({
+        package: 'somepackage',
+        outputter: 'json'
+      });
+
+      expect(shoulder.outputter, 'to be', outputters.json);
+    });
   });
 });
