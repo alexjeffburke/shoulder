@@ -241,4 +241,112 @@ describe('Shoulder', () => {
       expect(shoulder.outputter, 'to be', outputters.list);
     });
   });
+
+  describe('verifyProjects()', () => {
+    it('should verify the project with the supplied requirement', () => {
+      let verifyArgs;
+      const fakeProject = {
+        verify: (...args) => {
+          verifyArgs = args;
+
+          return Promise.resolve();
+        }
+      };
+      const MockProjectStats = createMockProjectStats();
+
+      return expect(
+        () =>
+          Shoulder.verifyProjects('somerequirement', [fakeProject], {
+            _ProjectStats: MockProjectStats
+          }),
+        'to be fulfilled'
+      ).then(() => {
+        expect(verifyArgs, 'to equal', ['somerequirement']);
+      });
+    });
+
+    it('should forward the verified project into ModuleStats', () => {
+      const fakeProject = {
+        verify: () => {
+          return Promise.resolve(fakeProject);
+        }
+      };
+      const MockProjectStats = createMockProjectStats();
+
+      return expect(
+        () =>
+          Shoulder.verifyProjects('somerequirement', [fakeProject], {
+            _ProjectStats: MockProjectStats
+          }),
+        'to be fulfilled'
+      ).then(() => {
+        expect(MockProjectStats, 'to have a call satisfying', [[fakeProject]]);
+      });
+    });
+
+    describe('when verification fails', () => {
+      it('should reject on project verification fail', () => {
+        const fakeProject = {
+          verify: () => {
+            return Promise.reject(new Error('unexpected failure'));
+          }
+        };
+        const MockProjectStats = createMockProjectStats();
+
+        return expect(
+          () =>
+            Shoulder.verifyProjects('somerequirement', [fakeProject], {
+              _ProjectStats: MockProjectStats,
+              _warn: () => {}
+            }),
+          'to be rejected'
+        );
+      });
+
+      it('should warn on project verification fail that is ignored', () => {
+        let warnString;
+        const fakeProject = {
+          verify: () => {
+            const error = new Error('ignored failure');
+            error.isNotFatal = true;
+            return Promise.reject(error);
+          }
+        };
+        const MockProjectStats = createMockProjectStats();
+
+        return expect(
+          () =>
+            Shoulder.verifyProjects('somerequirement', [fakeProject], {
+              _ProjectStats: MockProjectStats,
+              _warn: str => (warnString = str)
+            }),
+          'to be fulfilled'
+        ).then(() => {
+          expect(warnString, 'to equal', 'ignored failure');
+        });
+      });
+
+      it('should exclude a project on verification fail that is ignored', () => {
+        const fakeProject = {
+          verify: () => {
+            const error = new Error('ignored failure');
+            error.isNotFatal = true;
+            return Promise.reject(error);
+          }
+        };
+        const MockProjectStats = createMockProjectStats();
+
+        return expect(
+          () =>
+            Shoulder.verifyProjects('somerequirement', [fakeProject], {
+              _ProjectStats: MockProjectStats,
+              _warn: () => {}
+            }),
+          'to be fulfilled'
+        ).then(() => {
+          expect(MockProjectStats, 'to have a call satisfying', [[]]);
+        });
+      });
+    });
+  });
 });
