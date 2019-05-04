@@ -27,6 +27,16 @@ Signing up for this tool will provide you with an API key which can be used with
 npx shoulder fugl --librariesio <api_key>
 ```
 
+## Output
+
+By default, the tool outputs project names in a JSON format suitable for piping directly into
+[`fugl`](https://github.com/alexjeffburke/fugl). A simple list is also possible using a command
+line switch:
+
+```
+npx shoulder -l fugl
+```
+
 ## Metrics
 
 Shoulder supports a number of methods for determing the popularity of the dependent packages.
