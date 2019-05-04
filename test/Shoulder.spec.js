@@ -45,6 +45,16 @@ describe('Shoulder', () => {
     );
   });
 
+  it('should throw on an unsupported outputter', () => {
+    expect(
+      () => {
+        new Shoulder({ package: 'somepackage', outputter: 'unknown' });
+      },
+      'to throw',
+      'Shoulder: unsupported outputter unknown'
+    );
+  });
+
   it('should reject on invalid metric', () => {
     const MockModuleStats = createMockModuleStats();
     MockModuleStats._instance.fetchDependents.rejects(new Error('fail'));
