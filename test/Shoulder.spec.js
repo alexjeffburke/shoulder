@@ -240,6 +240,15 @@ describe('Shoulder', () => {
 
       expect(shoulder.outputter, 'to be', outputters.list);
     });
+
+    it('should allow nbsp', () => {
+      const shoulder = new Shoulder({
+        package: 'somepackage',
+        outputter: 'nbsp'
+      });
+
+      expect(shoulder.outputter, 'to be', outputters.nbsp);
+    });
   });
 
   describe('verifyProjects()', () => {

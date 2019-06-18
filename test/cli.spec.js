@@ -37,7 +37,7 @@ describe('cli', () => {
       'to be rejected'
     ).then(() => {
       expect(MockShoulder, 'to have a call exhaustively satisfying', [
-        { package: 'somepackage', outputter: 'json' }
+        { package: 'somepackage', outputter: 'nbsp' }
       ]);
     });
   });
@@ -85,8 +85,28 @@ describe('cli', () => {
     });
   });
 
+  it('should set the nbsp outputter by default', () => {
+    const MockShoulder = createMockShoulder();
+    MockShoulder._instance.run.rejects(new Error('fail'));
+    const args = {
+      package: 'somepackage'
+    };
+
+    return expect(
+      () =>
+        cli(null, args, {
+          _Shoulder: MockShoulder
+        }),
+      'to be rejected'
+    ).then(() => {
+      expect(MockShoulder, 'to have a call exhaustively satisfying', [
+        { package: 'somepackage', outputter: 'nbsp' }
+      ]);
+    });
+  });
+
   describe('with the list option', () => {
-    it('should set the list oututter', () => {
+    it('should set the list outputter', () => {
       const MockShoulder = createMockShoulder();
       MockShoulder._instance.run.rejects(new Error('fail'));
       const args = {
@@ -103,6 +123,29 @@ describe('cli', () => {
       ).then(() => {
         expect(MockShoulder, 'to have a call exhaustively satisfying', [
           { package: 'somepackage', outputter: 'list' }
+        ]);
+      });
+    });
+  });
+
+  describe('with the json option', () => {
+    it('should set the json outputter', () => {
+      const MockShoulder = createMockShoulder();
+      MockShoulder._instance.run.rejects(new Error('fail'));
+      const args = {
+        package: 'somepackage',
+        json: true
+      };
+
+      return expect(
+        () =>
+          cli(null, args, {
+            _Shoulder: MockShoulder
+          }),
+        'to be rejected'
+      ).then(() => {
+        expect(MockShoulder, 'to have a call exhaustively satisfying', [
+          { package: 'somepackage', outputter: 'json' }
         ]);
       });
     });
