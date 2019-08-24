@@ -286,7 +286,7 @@ describe('ModuleStats', () => {
 
     it('should fetch and record package.json', () => {
       fetchStub.resolves({
-        json: () => ({ _id: 'FOOID', _rev: 'FOOREV', name: 'fugl', foo: 'baz' })
+        json: () => ({ name: 'fugl', foo: 'baz' })
       });
       const moduleStats = new ModuleStats('fugl');
 
@@ -326,7 +326,7 @@ describe('ModuleStats', () => {
         'ModuleStats: error fetching package.json for "fugl"'
       ).then(() => {
         expect(fetchStub, 'to have a call satisfying', [
-          'https://registry.npmjs.org/fugl'
+          'https://registry.npmjs.org/fugl/latest'
         ]);
       });
     });
