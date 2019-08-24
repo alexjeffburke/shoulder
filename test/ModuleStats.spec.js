@@ -274,35 +274,35 @@ describe('ModuleStats', () => {
   });
 
   describe('#fetchInfo', () => {
-    let createPackageRequestStub;
+    let fetchStub;
 
     beforeEach(() => {
-      createPackageRequestStub = sinon.stub(
-        ModuleStats,
-        'createPackageRequest'
-      );
+      fetchStub = sinon.stub(ModuleStats, 'fetch');
     });
 
     afterEach(() => {
-      createPackageRequestStub.restore();
+      fetchStub.restore();
     });
 
     it('should fetch and record package.json', () => {
-      const result = { name: 'fugl', foo: 'bar' };
-      createPackageRequestStub.resolves(result);
+      fetchStub.resolves({
+        json: () => ({ _id: 'FOOID', _rev: 'FOOREV', name: 'fugl', foo: 'baz' })
+      });
       const moduleStats = new ModuleStats('fugl');
 
-      return expect(
-        moduleStats.fetchInfo(),
-        'to be fulfilled with',
-        result
-      ).then(() => {
-        expect(moduleStats.packageJson, 'to equal', result);
+      return expect(moduleStats.fetchInfo(), 'to be fulfilled with', {
+        name: 'fugl',
+        foo: 'baz'
+      }).then(() => {
+        expect(moduleStats.packageJson, 'to equal', {
+          name: 'fugl',
+          foo: 'baz'
+        });
       });
     });
 
     it('should return previously fetched package.json', () => {
-      createPackageRequestStub.resolves({ name: 'fugl', foo: 'baz' });
+      fetchStub.resolves();
       const moduleStats = new ModuleStats('fugl');
       const result = { name: 'fugl', foo: 'bar' };
       moduleStats.packageJson = result;
@@ -312,7 +312,22 @@ describe('ModuleStats', () => {
         'to be fulfilled with',
         result
       ).then(() => {
-        expect(createPackageRequestStub, 'was not called');
+        expect(fetchStub, 'was not called');
+      });
+    });
+
+    it('should reject on request error', () => {
+      fetchStub.rejects(new Error('failure'));
+      const moduleStats = new ModuleStats('fugl');
+
+      return expect(
+        () => moduleStats.fetchInfo(),
+        'to be rejected with',
+        'ModuleStats: error fetching package.json for "fugl"'
+      ).then(() => {
+        expect(fetchStub, 'to have a call satisfying', [
+          'https://registry.npmjs.org/fugl'
+        ]);
       });
     });
   });
