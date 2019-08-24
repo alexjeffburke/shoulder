@@ -20,7 +20,7 @@
     "is-git-url": "^1.0.0",
     "lodash": "4.17.11",
     "magicpen": "^6.0.2",
-    "mocha": "^5.2.0",
+    "mocha": "^6.2.0",
     "node-fetch": "^2.3.0",
     "normalize-git-url": "^3.0.2",
     "npm-stats": "^1.2.0",
