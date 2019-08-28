@@ -19,25 +19,26 @@ describe('ProjectStats', () => {
   });
 
   describe('#fetchMetricForProjects (downloads)', () => {
-    let createPackageRequestStub;
+    let fetchStub;
 
     beforeEach(() => {
-      createPackageRequestStub = sinon.stub(
-        ModuleStats,
-        'createPackageRequest'
-      );
+      fetchStub = sinon.stub(ModuleStats, 'fetch');
     });
 
     afterEach(() => {
-      createPackageRequestStub.restore();
+      fetchStub.restore();
     });
 
-    it('should total and return the stats for each package', () => {
-      createPackageRequestStub
+    it('should fetch and record package.json', () => {
+      fetchStub
         .onFirstCall()
-        .resolves([{ value: 2 }, { value: 3 }])
+        .resolves({
+          json: () => ({ downloads: [{ downloads: 2 }, { downloads: 3 }] })
+        })
         .onSecondCall()
-        .resolves([]);
+        .resolves({
+          json: () => ({ downloads: [] })
+        });
 
       const projectStats = new ProjectStats([
         new Project('somedependent'),
