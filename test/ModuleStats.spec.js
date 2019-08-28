@@ -45,19 +45,6 @@ describe('ModuleStats', () => {
   });
 
   describe('#fetchDependents', () => {
-    let createPackageRequestStub;
-
-    beforeEach(() => {
-      createPackageRequestStub = sinon.stub(
-        ModuleStats,
-        'createPackageRequest'
-      );
-    });
-
-    afterEach(() => {
-      createPackageRequestStub.restore();
-    });
-
     it('should reject on unsupported fetch source', () => {
       const moduleStats = new ModuleStats('somepackage');
 
@@ -77,7 +64,6 @@ describe('ModuleStats', () => {
         'fetchNpmDependents'
       );
       fetchNpmDependentsStub.resolves(['foo', 'bar', 'baz']);
-      createPackageRequestStub.resolves();
 
       return expect(moduleStats.fetchDependents(), 'to be fulfilled with', [
         'foo',
@@ -106,15 +92,15 @@ describe('ModuleStats', () => {
     });
 
     it('should return previously fetched dependents', () => {
-      createPackageRequestStub.resolves(['foo', 'bar', 'baz']);
+      const fetchSpy = sinon.spy(ModuleStats, 'fetch');
       const moduleStats = new ModuleStats('sompackage');
       moduleStats.dependents = ['quux'];
 
       return expect(moduleStats.fetchDependents(), 'to be fulfilled with', [
         'quux'
-      ]).then(() => {
-        expect(createPackageRequestStub, 'was not called');
-      });
+      ])
+        .then(() => expect(fetchSpy, 'was not called'))
+        .finally(() => fetchSpy.restore());
     });
   });
 
@@ -246,29 +232,15 @@ describe('ModuleStats', () => {
   });
 
   describe('#fetchNpmDependents', () => {
-    let createPackageRequestStub;
-
-    beforeEach(() => {
-      createPackageRequestStub = sinon.stub(
-        ModuleStats,
-        'createPackageRequest'
-      );
-    });
-
-    afterEach(() => {
-      createPackageRequestStub.restore();
-    });
-
     it('should fetch and record dependents', () => {
-      createPackageRequestStub.resolves(['foo', 'bar', 'baz']);
       const moduleStats = new ModuleStats('sompackage');
 
-      return expect(moduleStats.fetchNpmDependents(), 'to be fulfilled with', [
-        'foo',
-        'bar',
-        'baz'
-      ]).then(() => {
-        expect(moduleStats.dependents, 'to equal', ['foo', 'bar', 'baz']);
+      return expect(
+        moduleStats.fetchNpmDependents(),
+        'to be fulfilled with',
+        []
+      ).then(() => {
+        expect(moduleStats.dependents, 'to equal', []);
       });
     });
   });
@@ -360,39 +332,7 @@ describe('ModuleStats', () => {
     });
   });
 
-  describe('ModuleStats.createPackageRequest', () => {
-    function createFakeRegistry() {
-      const moduleNamespace = {
-        dependents: sinon.stub().named('dependents'),
-        downloads: sinon.stub().named('downloads')
-      };
-
-      return [
-        {
-          module: sinon
-            .stub()
-            .named('module')
-            .returns(moduleNamespace)
-        },
-        moduleNamespace
-      ];
-    }
-
-    it('should reject on request error', () => {
-      const [registry, moduleNamespace] = createFakeRegistry();
-
-      moduleNamespace.dependents.callsArgWith(0, new Error('failure'));
-
-      return expect(
-        () =>
-          ModuleStats.createPackageRequest('somepackage', 'dependents', {
-            _registry: registry
-          }),
-        'to be rejected with',
-        'failure'
-      );
-    });
-
+  describe('ModuleStats.createGitHubPackageJsonRequest', () => {
     describe('ModuleStats.createGitHubPackageJsonRequest', () => {
       let fetchStub;
 
