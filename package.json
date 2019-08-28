@@ -1,7 +1,7 @@
 {
   "name": "shoulder",
   "description": "Automatically find dependent projects for the specified package.",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "main": "lib/Shoulder.js",
   "author": "Alex J Burke <alex@alexjeffburke.com>",
   "repository": {
