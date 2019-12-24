@@ -232,15 +232,26 @@ describe('ModuleStats', () => {
   });
 
   describe('#fetchNpmDependents', () => {
-    it('should fetch and record dependents', () => {
-      const moduleStats = new ModuleStats('sompackage');
+    let dependantsStub;
 
-      return expect(
-        moduleStats.fetchNpmDependents(),
-        'to be fulfilled with',
-        []
-      ).then(() => {
-        expect(moduleStats.dependents, 'to equal', []);
+    beforeEach(() => {
+      dependantsStub = sinon.stub(ModuleStats, 'dependants');
+    });
+
+    afterEach(() => {
+      dependantsStub.restore();
+    });
+
+    it('should fetch and record dependents', () => {
+      const moduleStats = new ModuleStats('somepackage');
+      dependantsStub.resolves(['foo', 'bar', 'baz']);
+
+      return expect(moduleStats.fetchNpmDependents(), 'to be fulfilled with', [
+        'foo',
+        'bar',
+        'baz'
+      ]).then(() => {
+        expect(dependantsStub, 'to have a call satisfying', ['somepackage']);
       });
     });
   });

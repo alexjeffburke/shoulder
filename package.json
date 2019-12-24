@@ -15,6 +15,7 @@
     "shoulder": "./bin/shoulder"
   },
   "dependencies": {
+    "@alexjeffburke/npm-dependants": "^2.0.0-patch1",
     "@gustavnikolaj/async-main-wrap": "^3.0.0",
     "debug": "^4.1.1",
     "is-git-url": "^1.0.0",
