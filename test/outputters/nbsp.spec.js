@@ -7,7 +7,7 @@ const TEST_DATA_PATH = path.join(__dirname, '..', '..', 'testdata');
 
 describe('outputters/nbsp', () => {
   it('should output a project name per line', () => {
-    let lines = [];
+    const lines = [];
 
     return expect(
       () =>

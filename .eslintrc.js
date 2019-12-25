@@ -13,6 +13,9 @@ const config = {
   overrides: [
     {
       files: ['*.spec.js'],
+      env: {
+        mocha: true
+      },
       rules: {
         'no-new': 'off'
       }
