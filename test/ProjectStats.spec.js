@@ -29,7 +29,7 @@ describe('ProjectStats', () => {
       fetchStub.restore();
     });
 
-    it('should fetch and record package.json', () => {
+    it('should fetch npm download count', () => {
       fetchStub
         .onFirstCall()
         .resolves({
@@ -51,6 +51,30 @@ describe('ProjectStats', () => {
         {
           somedependent: 5,
           otherdependent: 0
+        }
+      );
+    });
+
+    it('should set a package to zero on an erroring request', () => {
+      fetchStub
+        .onFirstCall()
+        .rejects(new Error())
+        .onSecondCall()
+        .resolves({
+          json: () => ({ downloads: [{ downloads: 1 }] })
+        });
+
+      const projectStats = new ProjectStats([
+        new Project('somedependent'),
+        new Project('otherdependent')
+      ]);
+
+      return expect(
+        projectStats.fetchMetricForProjects('downloads'),
+        'to be fulfilled with',
+        {
+          somedependent: 0,
+          otherdependent: 1
         }
       );
     });
@@ -88,6 +112,28 @@ describe('ProjectStats', () => {
         {
           'https://github.com/org/foo.git': 5,
           'https://github.com/org/bar': 0
+        }
+      );
+    });
+
+    it('should set a package to zero on an erroring request', () => {
+      createGitHubRepositoryRequestStub
+        .onFirstCall()
+        .rejects(new Error())
+        .onSecondCall()
+        .resolves({ stargazers_count: 1 });
+
+      const projectStats = new ProjectStats([
+        new Project('https://github.com/org/foo.git'),
+        new Project('https://github.com/org/bar')
+      ]);
+
+      return expect(
+        projectStats.fetchMetricForProjects('stars'),
+        'to be fulfilled with',
+        {
+          'https://github.com/org/foo.git': 0,
+          'https://github.com/org/bar': 1
         }
       );
     });
