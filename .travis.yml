@@ -1,10 +1,21 @@
 language: node_js
+env:
+  - TARGET=test
 node_js:
   - '8'
   - '10'
   - '12'
 os:
   - linux
-script:
-  - 'npm run ci'
+matrix:
+  include:
+    - name: Lint
+      node_js: '8'
+      env:
+        - TARGET=lint
+    - name: Coverage
+      node_js: '8'
+      env:
+        - TARGET=coverage
+script: npm run $TARGET
 after_success: '<coverage/lcov.info ./node_modules/coveralls/bin/coveralls.js'
