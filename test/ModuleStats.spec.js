@@ -284,6 +284,32 @@ describe('ModuleStats', () => {
       });
     });
 
+    it('should fetch and record package.json for namespaced package', () => {
+      fetchStub.resolves({
+        json: () => ({
+          name: '@namespace/foo',
+          'dist-tags': { latest: '0.1.0' },
+          versions: {
+            '0.1.0': {
+              name: '@namespace/foo',
+              foo: 'baz'
+            }
+          }
+        })
+      });
+      const moduleStats = new ModuleStats('@namespace/foo');
+
+      return expect(moduleStats.fetchInfo(), 'to be fulfilled with', {
+        name: '@namespace/foo',
+        foo: 'baz'
+      }).then(() => {
+        expect(moduleStats.packageJson, 'to equal', {
+          name: '@namespace/foo',
+          foo: 'baz'
+        });
+      });
+    });
+
     it('should return previously fetched package.json', () => {
       fetchStub.resolves();
       const moduleStats = new ModuleStats('fugl');
