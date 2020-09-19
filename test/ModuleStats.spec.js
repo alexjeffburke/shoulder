@@ -551,4 +551,32 @@ describe('ModuleStats', () => {
       });
     });
   });
+
+  describe('ModuleStats.createNpmDownloadsRequest', () => {
+    let fetchStub;
+
+    beforeEach(() => {
+      fetchStub = sinon.stub(ModuleStats, 'fetch');
+    });
+
+    afterEach(() => {
+      fetchStub.restore();
+    });
+
+    it('should set a package to zero on a result erorr', () => {
+      const now = Date.now();
+      fetchStub.resolves({
+        json: () => ({ error: 'does not exist' })
+      });
+
+      return expect(
+        ModuleStats.createNpmDownloadsRequest('not_a_package', {
+          until: now,
+          since: now - 1
+        }),
+        'to be rejected with',
+        new Error('ModuleStats: error fetching downloads for "not_a_package"')
+      );
+    });
+  });
 });
