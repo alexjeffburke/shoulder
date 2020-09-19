@@ -59,19 +59,13 @@ describe('ModuleStats', () => {
 
     it('should fetch and record npm dependents', () => {
       const moduleStats = new ModuleStats('sompackage');
-      const fetchNpmDependentsStub = sinon.stub(
-        moduleStats,
-        'fetchNpmDependents'
-      );
-      fetchNpmDependentsStub.resolves(['foo', 'bar', 'baz']);
+      const fetchNpmDependentsStub = sinon
+        .stub(moduleStats, 'fetchNpmDependents')
+        .resolves([]);
 
-      return expect(moduleStats.fetchDependents(), 'to be fulfilled with', [
-        'foo',
-        'bar',
-        'baz'
-      ]).then(() => {
-        expect(fetchNpmDependentsStub, 'was called');
-      });
+      return expect(moduleStats.fetchDependents(), 'to be fulfilled').then(() =>
+        expect(fetchNpmDependentsStub, 'was called')
+      );
     });
 
     it('should fetch and record libraries.io dependents', () => {
@@ -244,7 +238,12 @@ describe('ModuleStats', () => {
 
     it('should fetch and record dependents', () => {
       const moduleStats = new ModuleStats('somepackage');
-      dependantsStub.resolves(['foo', 'bar', 'baz']);
+      function* fetchNpmDependents() {
+        yield Promise.resolve('foo');
+        yield Promise.resolve('bar');
+        yield Promise.resolve('baz');
+      }
+      dependantsStub.callsFake(fetchNpmDependents);
 
       return expect(moduleStats.fetchNpmDependents(), 'to be fulfilled with', [
         'foo',
