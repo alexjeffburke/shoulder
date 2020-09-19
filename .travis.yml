@@ -2,19 +2,19 @@ language: node_js
 env:
   - TARGET=test
 node_js:
-  - '8'
   - '10'
   - '12'
+  - '14'
 os:
   - linux
 matrix:
   include:
     - name: Lint
-      node_js: '8'
+      node_js: '10'
       env:
         - TARGET=lint
     - name: Coverage
-      node_js: '8'
+      node_js: '10'
       env:
         - TARGET=coverage
 script: npm run $TARGET
