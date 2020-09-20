@@ -23,7 +23,7 @@
     "normalize-git-url": "^3.0.2",
     "npm-dependants": "^2.1.2",
     "validate-npm-package-name": "^3.0.0",
-    "yargs": "^15.0.2"
+    "yargs": "^16.0.3"
   },
   "devDependencies": {
     "coveralls": "^3.0.0",
