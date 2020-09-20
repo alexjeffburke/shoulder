@@ -152,14 +152,15 @@ describe('Project', () => {
   describe('#queryNpmForPackageAndUpdate', () => {
     it('should error on npm query failure', () => {
       const project = new Project('somepackage');
+      const error = new Error('failure');
       const moduleStats = {
-        fetchInfo: sinon.stub().rejects(new Error())
+        fetchInfo: sinon.stub().rejects(error)
       };
 
       return expect(
         () => project.queryNpmForPackageAndUpdate('somepackage', moduleStats),
         'to be rejected with',
-        'unable to access package somepackage'
+        expect.it('to be', error)
       );
     });
 

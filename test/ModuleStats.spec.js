@@ -331,12 +331,27 @@ describe('ModuleStats', () => {
       return expect(
         () => moduleStats.fetchInfo(),
         'to be rejected with',
-        'ModuleStats: error fetching package.json for "fugl"'
+        'error fetching package.json for "fugl"'
       ).then(() => {
         expect(fetchStub, 'to have a call satisfying', [
           'https://registry.npmjs.org/fugl/latest'
         ]);
       });
+    });
+
+    it('should reject with a non-fatal error on request not found', () => {
+      fetchStub.resolves({
+        status: 404
+      });
+      const moduleStats = new ModuleStats('missing_package');
+
+      return expect(
+        () => moduleStats.fetchInfo(),
+        'to be rejected with',
+        expect
+          .it('to have message', 'unable to access package "missing_package"')
+          .and('to satisfy', { isNotFatal: true })
+      );
     });
   });
 
