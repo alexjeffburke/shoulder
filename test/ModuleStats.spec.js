@@ -369,185 +369,183 @@ describe('ModuleStats', () => {
   });
 
   describe('ModuleStats.createGitHubPackageJsonRequest', () => {
-    describe('ModuleStats.createGitHubPackageJsonRequest', () => {
-      let fetchStub;
+    let fetchStub;
 
-      beforeEach(() => {
-        fetchStub = sinon.stub(ModuleStats, 'fetch');
-      });
+    beforeEach(() => {
+      fetchStub = sinon.stub(ModuleStats, 'fetch');
+    });
 
-      afterEach(() => {
-        fetchStub.restore();
-      });
+    afterEach(() => {
+      fetchStub.restore();
+    });
 
-      it('should reject on request error', () => {
-        fetchStub.rejects(new Error('failure'));
+    it('should reject on request error', () => {
+      fetchStub.rejects(new Error('failure'));
 
-        return expect(
-          () =>
-            ModuleStats.createGitHubPackageJsonRequest(
-              'https://github.com/org/somepackage.git'
-            ),
-          'to be rejected with',
-          'Error feching package.json for https://github.com/org/somepackage.git'
-        ).then(() => {
-          expect(fetchStub, 'to have a call satisfying', [
-            'https://raw.githubusercontent.com/org/somepackage/master/package.json'
-          ]);
-        });
-      });
-
-      it('should reject on missing package name', () => {
-        fetchStub.resolves({
-          json: () => ({})
-        });
-
-        return expect(
-          () =>
-            ModuleStats.createGitHubPackageJsonRequest(
-              'https://github.com/org/somepackage.git'
-            ),
-          'to be rejected with',
-          'Missing name in package.json for https://github.com/org/somepackage.git'
-        ).then(() => {
-          expect(fetchStub, 'to have a call satisfying', [
-            'https://raw.githubusercontent.com/org/somepackage/master/package.json'
-          ]);
-        });
-      });
-
-      it('should resolve with repository info', () => {
-        fetchStub.resolves({
-          json: () => ({ name: 'some_old_package' })
-        });
-
-        return expect(
-          () =>
-            ModuleStats.createGitHubPackageJsonRequest(
-              'https://github.com/org/somepackage.git'
-            ),
-          'to be fulfilled with',
-          'some_old_package'
-        );
-      });
-
-      it('should handle repoUrl prefixed with git://', () => {
-        fetchStub.resolves({
-          json: () => ({ name: 'some_old_package' })
-        });
-
-        return expect(
-          () =>
-            ModuleStats.createGitHubPackageJsonRequest(
-              'git://github.com/org/somepackage.git'
-            ),
-          'to be fulfilled'
-        ).then(() => {
-          expect(fetchStub, 'to have a call satisfying', [
-            'https://raw.githubusercontent.com/org/somepackage/master/package.json'
-          ]);
-        });
-      });
-
-      it('should handle repoUrl prefixed with ssh://', () => {
-        fetchStub.resolves({
-          json: () => ({ name: 'some_old_package' })
-        });
-
-        return expect(
-          () =>
-            ModuleStats.createGitHubPackageJsonRequest(
-              'ssh://github.com/org/somepackage.git'
-            ),
-          'to be fulfilled'
-        ).then(() => {
-          expect(fetchStub, 'to have a call satisfying', [
-            'https://raw.githubusercontent.com/org/somepackage/master/package.json'
-          ]);
-        });
+      return expect(
+        () =>
+          ModuleStats.createGitHubPackageJsonRequest(
+            'https://github.com/org/somepackage.git'
+          ),
+        'to be rejected with',
+        'Error feching package.json for https://github.com/org/somepackage.git'
+      ).then(() => {
+        expect(fetchStub, 'to have a call satisfying', [
+          'https://raw.githubusercontent.com/org/somepackage/master/package.json'
+        ]);
       });
     });
 
-    describe('ModuleStats.createGitHubRepositoryRequest', () => {
-      let fetchStub;
-
-      beforeEach(() => {
-        fetchStub = sinon.stub(ModuleStats, 'fetch');
+    it('should reject on missing package name', () => {
+      fetchStub.resolves({
+        json: () => ({})
       });
 
-      afterEach(() => {
-        fetchStub.restore();
+      return expect(
+        () =>
+          ModuleStats.createGitHubPackageJsonRequest(
+            'https://github.com/org/somepackage.git'
+          ),
+        'to be rejected with',
+        'Missing name in package.json for https://github.com/org/somepackage.git'
+      ).then(() => {
+        expect(fetchStub, 'to have a call satisfying', [
+          'https://raw.githubusercontent.com/org/somepackage/master/package.json'
+        ]);
+      });
+    });
+
+    it('should resolve with repository info', () => {
+      fetchStub.resolves({
+        json: () => ({ name: 'some_old_package' })
       });
 
-      it('should reject on request error', () => {
-        fetchStub.rejects(new Error('failure'));
+      return expect(
+        () =>
+          ModuleStats.createGitHubPackageJsonRequest(
+            'https://github.com/org/somepackage.git'
+          ),
+        'to be fulfilled with',
+        'some_old_package'
+      );
+    });
 
-        return expect(
-          () =>
-            ModuleStats.createGitHubRepositoryRequest(
-              'https://github.com/org/somepackage.git'
-            ),
-          'to be rejected with',
-          'Error fetching repository for https://github.com/org/somepackage.git'
-        ).then(() => {
-          expect(fetchStub, 'to have a call satisfying', [
-            'https://api.github.com/repos/org/somepackage',
-            { headers: { Accept: 'application/vnd.github.v3+json' } }
-          ]);
-        });
+    it('should handle repoUrl prefixed with git://', () => {
+      fetchStub.resolves({
+        json: () => ({ name: 'some_old_package' })
       });
 
-      it('should resolve with repository info', () => {
-        fetchStub.resolves({
-          json: () => ({ stargazers_count: 45 })
-        });
+      return expect(
+        () =>
+          ModuleStats.createGitHubPackageJsonRequest(
+            'git://github.com/org/somepackage.git'
+          ),
+        'to be fulfilled'
+      ).then(() => {
+        expect(fetchStub, 'to have a call satisfying', [
+          'https://raw.githubusercontent.com/org/somepackage/master/package.json'
+        ]);
+      });
+    });
 
-        return expect(
-          () =>
-            ModuleStats.createGitHubRepositoryRequest(
-              'https://github.com/org/somepackage.git'
-            ),
-          'to be fulfilled with',
-          { stargazers_count: 45 }
-        );
+    it('should handle repoUrl prefixed with ssh://', () => {
+      fetchStub.resolves({
+        json: () => ({ name: 'some_old_package' })
       });
 
-      it('should handle repoUrl prefixed with git://', () => {
-        fetchStub.resolves({
-          json: () => ({})
-        });
+      return expect(
+        () =>
+          ModuleStats.createGitHubPackageJsonRequest(
+            'ssh://github.com/org/somepackage.git'
+          ),
+        'to be fulfilled'
+      ).then(() => {
+        expect(fetchStub, 'to have a call satisfying', [
+          'https://raw.githubusercontent.com/org/somepackage/master/package.json'
+        ]);
+      });
+    });
+  });
 
-        return expect(
-          () =>
-            ModuleStats.createGitHubRepositoryRequest(
-              'git://github.com/org/somepackage.git'
-            ),
-          'to be fulfilled'
-        ).then(() => {
-          expect(fetchStub, 'to have a call satisfying', [
-            'https://api.github.com/repos/org/somepackage',
-            { headers: { Accept: 'application/vnd.github.v3+json' } }
-          ]);
-        });
+  describe('ModuleStats.createGitHubRepositoryRequest', () => {
+    let fetchStub;
+
+    beforeEach(() => {
+      fetchStub = sinon.stub(ModuleStats, 'fetch');
+    });
+
+    afterEach(() => {
+      fetchStub.restore();
+    });
+
+    it('should reject on request error', () => {
+      fetchStub.rejects(new Error('failure'));
+
+      return expect(
+        () =>
+          ModuleStats.createGitHubRepositoryRequest(
+            'https://github.com/org/somepackage.git'
+          ),
+        'to be rejected with',
+        'Error fetching repository for https://github.com/org/somepackage.git'
+      ).then(() => {
+        expect(fetchStub, 'to have a call satisfying', [
+          'https://api.github.com/repos/org/somepackage',
+          { headers: { Accept: 'application/vnd.github.v3+json' } }
+        ]);
+      });
+    });
+
+    it('should resolve with repository info', () => {
+      fetchStub.resolves({
+        json: () => ({ stargazers_count: 45 })
       });
 
-      it('should handle repoUrl prefixed with ssh://', () => {
-        fetchStub.resolves({
-          json: () => ({})
-        });
+      return expect(
+        () =>
+          ModuleStats.createGitHubRepositoryRequest(
+            'https://github.com/org/somepackage.git'
+          ),
+        'to be fulfilled with',
+        { stargazers_count: 45 }
+      );
+    });
 
-        return expect(
-          () =>
-            ModuleStats.createGitHubRepositoryRequest(
-              'ssh://github.com/org/somepackage.git'
-            ),
-          'to be fulfilled'
-        ).then(() => {
-          expect(fetchStub, 'to have a call satisfying', [
-            'https://api.github.com/repos/org/somepackage',
-            { headers: { Accept: 'application/vnd.github.v3+json' } }
-          ]);
-        });
+    it('should handle repoUrl prefixed with git://', () => {
+      fetchStub.resolves({
+        json: () => ({})
+      });
+
+      return expect(
+        () =>
+          ModuleStats.createGitHubRepositoryRequest(
+            'git://github.com/org/somepackage.git'
+          ),
+        'to be fulfilled'
+      ).then(() => {
+        expect(fetchStub, 'to have a call satisfying', [
+          'https://api.github.com/repos/org/somepackage',
+          { headers: { Accept: 'application/vnd.github.v3+json' } }
+        ]);
+      });
+    });
+
+    it('should handle repoUrl prefixed with ssh://', () => {
+      fetchStub.resolves({
+        json: () => ({})
+      });
+
+      return expect(
+        () =>
+          ModuleStats.createGitHubRepositoryRequest(
+            'ssh://github.com/org/somepackage.git'
+          ),
+        'to be fulfilled'
+      ).then(() => {
+        expect(fetchStub, 'to have a call satisfying', [
+          'https://api.github.com/repos/org/somepackage',
+          { headers: { Accept: 'application/vnd.github.v3+json' } }
+        ]);
       });
     });
   });
