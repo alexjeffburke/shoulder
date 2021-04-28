@@ -25,7 +25,6 @@
     "yargs": "^16.0.3"
   },
   "devDependencies": {
-    "coveralls": "^3.0.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.7.0",
     "eslint-config-standard": "^14.1.0",
