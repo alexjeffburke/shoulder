@@ -1,9 +1,18 @@
 #!/usr/bin/env node
 
-const wrap = require('@gustavnikolaj/async-main-wrap');
 const yargs = require('yargs');
 
 const cli = require('../lib/cli');
+
+function exitWithError(err) {
+  console.error(process.env.DEBUG ? err.stack : String(err));
+
+  if (typeof err.exitCode === 'number') {
+    process.exit(err.exitCode);
+  }
+
+  process.exit(1);
+}
 
 const configureArgs = () => yargs =>
   yargs
@@ -51,4 +60,10 @@ const processArgsAndExecute = cwd => {
   return cli(cwd, argv);
 };
 
-wrap(processArgsAndExecute)(process.cwd());
+(async () => {
+  try {
+    await processArgsAndExecute(process.cwd());
+  } catch (e) {
+    exitWithError(e);
+  }
+})();
