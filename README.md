@@ -15,6 +15,11 @@ and supplied a package name:
 npx shoulder fugl
 ```
 
+If you wish to easily perform the check on a module being developed locally, you can execute shoulder
+in the checked out repository and supply "." as the package name to cause reading the package.json file:
+
+npx shoulder .
+
 ### devDependencies via Libraries.IO
 
 By default, Shoulder uses dependents information from npm. One limitation of this data is that it

@@ -9,7 +9,8 @@ const configureArgs = () => yargs =>
   yargs
     .positional('package', {
       type: 'string',
-      describe: 'The package for which to fetch dependents.'
+      describe:
+        'The package for which to fetch dependents.\nUse "." to read the name from package.json in the current directory.'
     })
     .option('list', {
       alias: 'l',

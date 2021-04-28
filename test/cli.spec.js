@@ -2,8 +2,12 @@ const expect = require('unexpected')
   .clone()
   .use(require('unexpected-sinon'));
 const sinon = require('sinon');
+const path = require('path');
 
 const cli = require('../lib/cli');
+
+const ROOT_PATH = path.join(__dirname, '..');
+const TEST_DATA_PATH = path.join(ROOT_PATH, 'testdata');
 
 function createMockShoulder() {
   const MockShoulder = sinon.stub().named('MockShoulder');
@@ -102,6 +106,70 @@ describe('cli', () => {
       expect(MockShoulder, 'to have a call exhaustively satisfying', [
         { package: 'somepackage', outputter: 'nbsp' }
       ]);
+    });
+  });
+
+  describe('with a "." as the package name', () => {
+    it('should use package.json from the cwd', () => {
+      const cwd = ROOT_PATH;
+      const MockShoulder = createMockShoulder();
+      const sucessSentinel = Symbol('sucessSentinel');
+      MockShoulder._instance.run.returns(sucessSentinel);
+
+      const result = cli(
+        cwd,
+        {
+          package: '.'
+        },
+        {
+          _Shoulder: MockShoulder
+        }
+      );
+
+      expect(result, 'to equal', sucessSentinel);
+    });
+
+    it('should set the package name from package.json', () => {
+      const cwd = ROOT_PATH;
+      const MockShoulder = createMockShoulder();
+
+      cli(
+        cwd,
+        {
+          package: '.'
+        },
+        {
+          _Shoulder: MockShoulder
+        }
+      );
+
+      expect(MockShoulder, 'to have a call exhaustively satisfying', [
+        { package: 'shoulder', outputter: 'nbsp' }
+      ]);
+    });
+
+    it('should error with no valid package name', () => {
+      const cwd = path.join(TEST_DATA_PATH, 'module-no-name');
+
+      expect(
+        () => {
+          cli(cwd, { package: '.' }, {});
+        },
+        'to throw',
+        'Shoulder: missing package'
+      );
+    });
+
+    it('should error with no valid package file', () => {
+      const cwd = TEST_DATA_PATH;
+
+      expect(
+        () => {
+          cli(cwd, { package: '.' }, {});
+        },
+        'to throw',
+        'Shoulder: missing package'
+      );
     });
   });
 
